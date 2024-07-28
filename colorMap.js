@@ -1,20 +1,34 @@
 'use strict';
 
-import { visualise } from './visualise.js';
-import { Point3D } from './triangulationClasses.mjs';
+/* Начнем с построения триангуляции, используя индексы. Это позволит быстро создать базовую структуру триангуляции.
+После построения триангуляции, создадим объектную модель, состоящую из Point, Edge и Triangle объектов. Заполним эти объекты данными, полученными из индексной структуры.
+Теперь, имея объектную модель триангуляции, можем использовать ее для дальнейших операций, таких как построение изолиний и изоконтуров.
+Преимущества такого подхода:
+Быстрое построение начальной триангуляции с использованием индексов.
+Создание объектной модели на основе этой триангуляции, что упростит дальнейшую обработку данных.
+Возможность использовать объектную модель для более сложных операций, таких как построение изолиний и изоконтуров.
+Таким образом, получаем преимущества как быстрого построения триангуляции, так и удобной объектной модели для последующей обработки данных. Это позволит эффективно реализовать весь необходимый функционал.let EPS = 1e-7; // эпсилон для работы с вещественными числами
+*/
+import { visualise2d } from './visualise.js';
+import { triangulate } from './delanay.mjs';
+import { importPointsFromCSV } from './imput_data.js';
+import { points3dTo2d } from './imput_data.js';
 
-const canvas = document.querySelector("canvas");
+let points = [];// Экспортируем переменную points
 // генерация точек множества при помощи нормального распределения
-const size = 100;
-let points = [];
-for (let i = 0; i < size; i++) {
-    let x = Math.random() * canvas.width,
-    y = Math.random() * canvas.height,
-    z = Math.random() * 20;
-    points.push(new Point3D(Math.round(x), Math.round(y), Math.round(z)));
-}
+// let points = randomPoints(100);
+// let points = importPointsFromCSV('./input_data/kgs1.csv')
 
+// Ассинхронная мура
+// Пример использования
+(async () => {
+    const fileName = './input_data/kgs1.csv'; // Укажите путь к вашему CSV файлу
+    const points = await importPointsFromCSV(fileName);
+    // console.log(points);
+    // преобразуем 2д точки в двумерный массив
+    let pnts = points3dTo2d(points)
+    // Теперь триангулируем
+    let triangles = triangulate(pnts);
+    visualise2d(pnts, triangles);
 
-
-// Использование функции
-visualise(points);
+})();

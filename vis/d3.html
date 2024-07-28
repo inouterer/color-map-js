@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contour Plot with D3.js</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 5px;
+            box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+            pointer-events: none;
+        }
+
+        .contour {
+            fill: none;
+            stroke: black;
+            stroke-width: 0.8px;
+        }
+
+        .contour-filled {
+            fill-opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        // Размеры SVG
+        const width = 800;
+        const height = 600;
+        const margin = {top: 20, right: 30, bottom: 30, left: 40};
+
+        // Создание SVG контейнера
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Генерация данных
+        const data = d3.range(500).map(() => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            z: Math.random() * 100
+        }));
+
+        // Скалирование для данных
+        const xScale = d3.scaleLinear().domain([0, width]).range([margin.left, width - margin.right]);
+        const yScale = d3.scaleLinear().domain([0, height]).range([margin.top, height - margin.bottom]);
+        const zScale = d3.scaleSequential(d3.interpolateTurbo).domain([0, 100]);
+
+        // Создание контуров
+        const contours = d3.contourDensity()
+            .x(d => xScale(d.x))
+            .y(d => yScale(d.y))
+            .size([width, height])
+            .bandwidth(30) // Ширина контуров
+            .thresholds(d3.range(0, 100, 10)); // Уровни изоконтур
+
+        // Создание группы для изоконтуров
+        svg.append("g")
+            .selectAll("path")
+            .data(contours(data))
+            .enter().append("path")
+            .attr("d", d3.geoPath())
+            .attr("class", "contour-filled")
+            .attr("fill", d => zScale(d.value));
+
+        // Создание группы для линий изоконтуров
+        svg.append("g")
+            .selectAll("path")
+            .data(contours(data))
+            .enter().append("path")
+            .attr("d", d3.geoPath())
+            .attr("class", "contour");
+
+        // Добавление точек
+        svg.append("g")
+            .selectAll("circle")
+            .data(data)
+            .enter().append("circle")
+            .attr("cx", d => xScale(d.x))
+            .attr("cy", d => yScale(d.y))
+            .attr("r", 2)
+            .attr("fill", d => zScale(d.z));
+
+        // Добавление масштабирования и панорамирования
+        const zoom = d3.zoom()
+            .scaleExtent([1, 10]) // Ограничение зума
+            .on("zoom", zoomed);
+
+        svg.call(zoom);
+
+        function zoomed(event) {
+            svg.attr("transform", event.transform);
+        }
+    </script>
+</body>
+</html>

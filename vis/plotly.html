@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plotly.js Contour Plot</title>
+    <!-- Подключение Plotly.js через CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div id="plot" style="width: 800px; height: 600px;"></div>
+    <script>
+        // Генерация данных
+        const x = [];
+        const y = [];
+        const z = [];
+
+        for (let i = 0; i < 100; i++) {
+            const xi = Math.random() * 10;
+            const yi = Math.random() * 10;
+            const zi = Math.sin(xi) + Math.cos(yi);
+
+            x.push(xi);
+            y.push(yi);
+            z.push(zi);
+        }
+
+        // Определение данных для Plotly
+        const data = [{
+            x: x,
+            y: y,
+            z: z,
+            type: 'contour', // Тип графика - изоконтур
+            colorscale: 'Viridis', // Цветовая шкала
+            contours: {
+                showlines: true, // Показывать линии
+                coloring: 'heatmap' // Закрашивание изоконтур
+            }
+        }];
+
+        // Параметры графика
+        const layout = {
+            title: 'Contour Plot with Plotly.js',
+            xaxis: {
+                title: 'X Axis'
+            },
+            yaxis: {
+                title: 'Y Axis'
+            }
+        };
+
+        // Отрисовка графика
+        Plotly.newPlot('plot', data, layout);
+    </script>
+</body>
+</html>

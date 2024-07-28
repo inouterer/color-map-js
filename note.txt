@@ -1,0 +1,4 @@
+Проект (директории и файлы): kebab-case
+Модули (файлы): camelCase или kebab-case
+Переменные и функции: camelCase
+Классы: PascalCase
